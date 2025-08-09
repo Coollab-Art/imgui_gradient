@@ -1,13 +1,16 @@
 ---
 Checks: '
   *,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -readability-math-missing-parentheses,
   -readability-convert-member-functions-to-static,
   -misc-non-private-member-variables-in-classes,
-  -*braces-around-statements
-  -readability-implicit-bool-conversion
+  -*braces-around-statements,
+  -readability-implicit-bool-conversion,
   -readability-identifier-length,
   -cppcoreguidelines-avoid-magic-numbers,
   -readability-magic-numbers,
+  -readability-redundant-member-init,
   -readability-redundant-access-specifiers,
   -readability-redundant-string-init,
   -misc-use-anonymous-namespace,
@@ -34,4 +37,4 @@ Checks: '
   -objc-*,
   -openmp-*,
   -zircon-*,
-  '
+'

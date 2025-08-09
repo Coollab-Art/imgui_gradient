@@ -18,7 +18,8 @@ static auto selector_with_tooltip(
     const auto width{
         ImGui::CalcTextSize(longuest_item_name).x
         + ImGui::GetFrameHeightWithSpacing()
-        + ImGui::GetStyle().FramePadding.x * 2.f};
+        + ImGui::GetStyle().FramePadding.x * 2.f
+    };
     ImGui::SetNextItemWidth(width);
 
     auto modified{false};
