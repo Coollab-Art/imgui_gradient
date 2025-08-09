@@ -134,7 +134,6 @@ static void draw_gradient_bar(
     ImGui::SetCursorScreenPos(
         gradient_bar_position + ImVec2{0.f, gradient_size.y}
     );
-    ImGui::Dummy({0.f, 0.f}); // Needed by ImGui after a SetCursorScreenPos
 }
 
 static auto handle_interactions_with_hovered_mark(
@@ -353,10 +352,7 @@ auto GradientWidget::widget(
     ImGui::PushID(label);
     ImGui::BeginGroup();
     if (!(settings.flags & Flag::NoLabel))
-    {
         ImGui::TextUnformatted(label);
-        ImGui::Dummy(ImVec2{0.f, 1.5f});
-    }
 
     const auto gradient_bar_position = ImVec2{internal::gradient_position(settings.horizontal_margin)};
     const auto gradient_size         = ImVec2{
