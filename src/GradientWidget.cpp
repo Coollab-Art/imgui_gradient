@@ -356,14 +356,16 @@ auto GradientWidget::widget(
 
     const auto gradient_bar_position = ImVec2{internal::gradient_position(settings.horizontal_margin)};
     const auto gradient_size         = ImVec2{
-        std::max( // To avoid a width equal to zero and library crash the minimum width value is 1.f
+        // To avoid a width equal to zero and library crash the minimum width value is 1.f
+        std::max(
             1.f,
-            std::min( // When the window is smaller than gradient width we compute a relative width
+            // When the window is smaller than gradient width we compute a relative width
+            std::min(
                 ImGui::GetContentRegionAvail().x - settings.horizontal_margin * 2.f,
                 settings.gradient_width * ImGui::GetFontSize() / 20.f
             )
-                ),
-                settings.gradient_height * ImGui::GetFontSize() / 20.f
+        ),
+        settings.gradient_height * ImGui::GetFontSize() / 20.f
     };
 
     ImGui::BeginGroup();
@@ -372,13 +374,11 @@ auto GradientWidget::widget(
 
     const auto wants_to_add_mark{ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)}; // We need to declare it before drawing the marks because we want to
                                                                                                           // test if the mouse is hovering the gradient bar not the marks.
-    MarkId     mark_to_delete{};
-    const auto res                    = draw_gradient_marks( // We declare it here because even if we cannot add a mark we need to draw gradient marks.
-        mark_to_delete,
-        gradient_bar_position,
-        gradient_size,
-        settings
-    );
+    MarkId mark_to_delete{};
+
+    // We declare it here because even if we cannot add a mark we need to draw gradient marks.
+    const auto res = draw_gradient_marks(mark_to_delete, gradient_bar_position, gradient_size, settings);
+
     const auto mark_hitbox_is_hovered = res.hitbox_is_hovered;
     modified |= res.selected_mark_changed;
 

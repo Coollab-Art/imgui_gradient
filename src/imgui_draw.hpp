@@ -1,10 +1,10 @@
 #pragma once
 
+#include <imgui_internal.h>
 #include "Gradient.hpp"
 #include "Interpolation.hpp"
 #include "Settings.hpp"
 #include "internal.hpp"
-#include <imgui_internal.h>
 
 namespace ImGG {
 
