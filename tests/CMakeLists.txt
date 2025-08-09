@@ -61,7 +61,7 @@ include(FetchContent)
 FetchContent_Declare(
     quick_imgui
     GIT_REPOSITORY https://github.com/Coollab-Art/quick_imgui
-    GIT_TAG fb65f53c36e48a12ff2a4f0c843ab40f639311ff
+    GIT_TAG 42d99ada8bd474ae6ca8e98193807daf39b6b93d
 )
 FetchContent_MakeAvailable(quick_imgui)
 cmake_policy(SET CMP0079 NEW)
