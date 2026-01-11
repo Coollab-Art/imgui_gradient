@@ -148,12 +148,12 @@ TEST_CASE("Distribute marks evenly")
         gradient.distribute_marks_evenly(); // Test that this doesn't crash.
 
         // With 1 mark
-        gradient.add_mark({ImGG::RelativePosition{0.3f}, ImGG::ColorRGBA{}});
+        gradient.add_mark(ImGG::Mark{ImGG::RelativePosition{0.3f}, ImGG::ColorRGBA{}});
         gradient.distribute_marks_evenly();
         CHECK(marks.begin()->position.get() == doctest::Approx{0.5f});
 
         // With 2 marks
-        gradient.add_mark({ImGG::RelativePosition{0.8f}, ImGG::ColorRGBA{}});
+        gradient.add_mark(ImGG::Mark{ImGG::RelativePosition{0.8f}, ImGG::ColorRGBA{}});
         gradient.distribute_marks_evenly();
         if (gradient.interpolation_mode() == ImGG::Interpolation::Linear)
         {

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <imgui.h>
 #include <cassert>
 #include "WrapMode.hpp"
