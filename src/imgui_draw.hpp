@@ -19,7 +19,8 @@ void draw_gradient(
     ImDrawList&     draw_list,
     const Gradient& gradient,
     ImVec2          gradient_position,
-    ImVec2          size
+    ImVec2          size,
+    Settings const& settings
 );
 
 void draw_marks(

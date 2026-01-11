@@ -112,9 +112,10 @@ static auto open_color_picker_popup(
 }
 
 static void draw_gradient_bar(
-    Gradient&    gradient,
-    const ImVec2 gradient_bar_position,
-    const ImVec2 gradient_size
+    Gradient&       gradient,
+    const ImVec2    gradient_bar_position,
+    const ImVec2    gradient_size,
+    Settings const& settings
 )
 {
     ImDrawList& draw_list = *ImGui::GetWindowDrawList();
@@ -128,7 +129,8 @@ static void draw_gradient_bar(
             draw_list,
             gradient,
             gradient_bar_position,
-            gradient_size
+            gradient_size,
+            settings
         );
     }
     ImGui::SetCursorScreenPos(
@@ -370,7 +372,7 @@ auto GradientWidget::widget(
 
     ImGui::BeginGroup();
     ImGui::InvisibleButton("gradient_editor", gradient_size);
-    draw_gradient_bar(_gradient, gradient_bar_position, gradient_size);
+    draw_gradient_bar(_gradient, gradient_bar_position, gradient_size, settings);
 
     const auto wants_to_add_mark{ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)}; // We need to declare it before drawing the marks because we want to
                                                                                                           // test if the mouse is hovering the gradient bar not the marks.

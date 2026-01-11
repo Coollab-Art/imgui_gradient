@@ -1,5 +1,4 @@
 #pragma once
-
 #include <imgui.h>
 #include <functional>
 #include "Flags.hpp"
@@ -16,6 +15,12 @@ struct Settings {
     float gradient_width{500.f};
     float gradient_height{40.f}; // Must be strictly positive
     float horizontal_margin{10.f};
+
+    /// To draw our gradient between two marks, we use several AddRectFilledMultiColor because ImGui uses sRGB interpolation, but ImGG wants to use Oklab colors and Premultiplied alpha.
+    /// This helps reduce the visual difference in the preview inside ImGui.
+    /// Increasing the value of `gradient_subdivisions` will increase fidelity but decrease performance.
+    /// Set it to 0 do disable the subdivisions and use a single ImGui's AddRectFilledMultiColor.
+    int gradient_subdivisions{3};
 
     /// Distance under the gradient bar to delete a mark by dragging it down.
     /// This behaviour can also be disabled with the Flag::NoDragDowntoDelete.
