@@ -49,6 +49,7 @@ To add this library to your project, simply add these three lines to your *CMake
 add_subdirectory(path/to/imgui_gradient)
 target_include_directories(imgui_gradient SYSTEM PRIVATE folder/containing/imgui)
 target_link_libraries(${PROJECT_NAME} PRIVATE imgui_gradient::imgui_gradient)
+target_compile_definitions(imgui_gradient PRIVATE IMGUI_DEFINE_MATH_OPERATORS) # Don't do this line if you have your own ImGui math operators
 ```
 
 Then include it as:
