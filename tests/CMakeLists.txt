@@ -30,7 +30,7 @@ include(FetchContent)
 FetchContent_Declare(
     doctest
     GIT_REPOSITORY https://github.com/doctest/doctest
-    GIT_TAG b7c21ec5ceeadb4951b00396fc1e4642dd347e5f
+    GIT_TAG 1da23a3e8119ec5cce4f9388e91b065e20bf06f5
 )
 FetchContent_MakeAvailable(doctest)
 target_link_libraries(${PROJECT_NAME} PRIVATE doctest::doctest)
@@ -55,6 +55,10 @@ if(GIT_FOUND)
 else()
     message("Git executable not found.")
 endif()
+
+# ---IMGUI_DEFINE_MATH_OPERATORS---
+target_compile_definitions(imgui_gradient PRIVATE IMGUI_DEFINE_MATH_OPERATORS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_DEFINE_MATH_OPERATORS)
 
 # ---Add quick_imgui---
 include(FetchContent)

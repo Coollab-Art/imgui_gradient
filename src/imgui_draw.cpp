@@ -1,3 +1,6 @@
+#include <imgui.h>
+#include <vector>
+#include "ColorRGBA.hpp"
 #include "Gradient.hpp"
 #include "Interpolation.hpp"
 #include "Settings.hpp"
@@ -37,58 +40,83 @@ static void draw_naive_gradient_between_two_colors(
     );
 }
 
-// We draw two "naive" gradients to reduce the visual artifacts.
+// We draw multiple "naive" gradients to reduce the visual artifacts.
 // The problem is that ImGui does its color interpolation in sRGB space which doesn't look the best.
-// We use Lab for better-looking results.
+// We use Oklab color space and Premultiplied Alpha for better-looking results.
 static void draw_gradient_between_two_colors(
-    ImDrawList&   draw_list,
-    ImVec2 const  top_left_corner,
-    ImVec2 const  bottom_right_corner,
-    ImVec4 const& color_left, ImVec4 const& color_right,
-    bool use_paint_blending
+    ImDrawList&      draw_list,
+    ImVec2 const     top_left_corner,
+    ImVec2 const     bottom_right_corner,
+    ColorRGBA const& left_color,
+    ColorRGBA const& right_color,
+    int              subdivisions,
+    bool             use_paint_blending
 )
 {
-    auto const color_middle = [&] {
-        if (use_paint_blending)
-        {
-            auto res = ImVec4{};
-            mixbox_lerp_float(
-                color_left.x, color_left.y, color_left.z,
-                color_right.x, color_right.y, color_right.z,
-                0.5f,
-                &res.x, &res.y, &res.z
-            );
-            res.w = (color_left.w + color_right.w) * 0.5f;
-            return res;
-        }
-        else // NOLINT(*-else-after-return)
-        {
-            return internal::sRGB_Straight_from_Oklab_Premultiplied(
-                (
-                    internal::Oklab_Premultiplied_from_sRGB_Straight(color_left)
-                    + internal::Oklab_Premultiplied_from_sRGB_Straight(color_right)
-                )
-                * ImVec4{0.5f, 0.5f, 0.5f, 0.5f}
-            );
-        }
-    }();
-    auto const color_left_as_ImU32   = ImGui::ColorConvertFloat4ToU32(color_left);
-    auto const color_middle_as_ImU32 = ImGui::ColorConvertFloat4ToU32(color_middle);
-    auto const color_right_as_ImU32  = ImGui::ColorConvertFloat4ToU32(color_right);
+    if (subdivisions == 0)
+        draw_naive_gradient_between_two_colors(draw_list, top_left_corner, bottom_right_corner, ImGui::ColorConvertFloat4ToU32(left_color), ImGui::ColorConvertFloat4ToU32(right_color));
 
-    auto const middle_x             = (top_left_corner.x + bottom_right_corner.x) * 0.5f;
-    auto const bottom_middle_corner = ImVec2{middle_x, bottom_right_corner.y};
-    auto const top_middle_corner    = ImVec2{middle_x, top_left_corner.y};
+    auto const to_oklab = [](ImVec4 const& col) {
+        return internal::Oklab_Premultiplied_from_sRGB_Straight(col);
+    };
+    auto const to_sRGB = [](ImVec4 const& col) {
+        return ImGui::ColorConvertFloat4ToU32(internal::sRGB_Straight_from_Oklab_Premultiplied(col));
+    };
+    auto const paint_blend = [](ImVec4 const& color_left, ImVec4 const& color_right, float t) { // Color should be in sRGB Straight Alpha
+        auto res = ImVec4{};
+        mixbox_lerp_float(
+            color_left.x, color_left.y, color_left.z,
+            color_right.x, color_right.y, color_right.z,
+            t,
+            &res.x, &res.y, &res.z
+        );
+        res.w = color_left.w * (1.f - t) + color_right.w * t;
+        return ImGui::ColorConvertFloat4ToU32(res);
+    };
 
-    draw_naive_gradient_between_two_colors(draw_list, top_left_corner, bottom_middle_corner, color_left_as_ImU32, color_middle_as_ImU32);
-    draw_naive_gradient_between_two_colors(draw_list, top_middle_corner, bottom_right_corner, color_middle_as_ImU32, color_right_as_ImU32);
+    auto const left_oklab  = to_oklab(left_color);
+    auto const right_oklab = to_oklab(right_color);
+
+    // Create all the X coords and all the colors for the sub-gradients
+    auto xs     = std::vector<float>{};
+    auto colors = std::vector<ImU32>{};
+    xs.push_back(top_left_corner.x);
+    colors.push_back(ImGui::ColorConvertFloat4ToU32(left_color));
+    for (int i = 0; i < subdivisions; ++i)
+    {
+        float const t = static_cast<float>(i + 1) / static_cast<float>(subdivisions + 1);
+        xs.push_back(top_left_corner.x * (1.f - t) + bottom_right_corner.x * t);
+        colors.push_back(
+            use_paint_blending
+                ? paint_blend(left_color, right_color, t)
+                : to_sRGB(
+                      left_oklab * ImVec4{1.f - t, 1.f - t, 1.f - t, 1.f - t}
+                      + right_oklab * ImVec4{t, t, t, t}
+                  )
+
+        );
+    }
+    xs.push_back(bottom_right_corner.x);
+    colors.push_back(ImGui::ColorConvertFloat4ToU32(right_color));
+
+    for (size_t i = 0; i < colors.size() - 1; ++i)
+    {
+        draw_naive_gradient_between_two_colors(
+            draw_list,
+            ImVec2{xs[i], top_left_corner.y},
+            ImVec2{xs[i + 1], bottom_right_corner.y},
+            colors[i],
+            colors[i + 1]
+        );
+    }
 }
 
 void draw_gradient(
     ImDrawList&     draw_list,
     const Gradient& gradient,
     const ImVec2    gradient_position,
-    const ImVec2    size
+    const ImVec2    size,
+    Settings const& settings
 )
 {
     assert(!gradient.is_empty());
@@ -114,6 +142,7 @@ void draw_gradient(
                     ImVec2{from - 0.55f, gradient_position.y},        // We extend the rectangle by 0.55 on each side, otherwise there can be small gaps that appear between rectangles
                     ImVec2{to + 0.55f, gradient_position.y + size.y}, // (for some gradient width and some mark positions) (see https://github.com/Coollab-Art/imgui_gradient/issues/5)
                     color_left, color_right,
+                    settings.gradient_subdivisions,
                     gradient.interpolation_mode() == Interpolation::Linear_Paint
                 );
             }

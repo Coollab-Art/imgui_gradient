@@ -39,6 +39,7 @@ auto main(int argc, char* argv[]) -> int
                     ImGui::DragFloat("Gradient width", &settings.gradient_width);
                     ImGui::DragFloat("Gradient height", &settings.gradient_height);
                     ImGui::DragFloat("Horizontal margin", &settings.horizontal_margin);
+                    ImGui::SliderInt("Gradient subdivisions", &settings.gradient_subdivisions, 0, 5);
                     ImGui::DragFloat("Distance to delete mark by dragging down", &settings.distance_to_delete_mark_by_dragging_down);
                     ImGui::End();
                     ImGui::Begin("Programmatic Actions");
@@ -147,12 +148,12 @@ TEST_CASE("Distribute marks evenly")
         gradient.distribute_marks_evenly(); // Test that this doesn't crash.
 
         // With 1 mark
-        gradient.add_mark({ImGG::RelativePosition{0.3f}, ImGG::ColorRGBA{}});
+        gradient.add_mark(ImGG::Mark{ImGG::RelativePosition{0.3f}, ImGG::ColorRGBA{}});
         gradient.distribute_marks_evenly();
         CHECK(marks.begin()->position.get() == doctest::Approx{0.5f});
 
         // With 2 marks
-        gradient.add_mark({ImGG::RelativePosition{0.8f}, ImGG::ColorRGBA{}});
+        gradient.add_mark(ImGG::Mark{ImGG::RelativePosition{0.8f}, ImGG::ColorRGBA{}});
         gradient.distribute_marks_evenly();
         if (gradient.interpolation_mode() == ImGG::Interpolation::Linear_Light)
         {

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "ColorRGBA.hpp"
 #include "RelativePosition.hpp"
 
@@ -9,9 +8,8 @@ struct Mark {
     RelativePosition position;
     ColorRGBA        color;
 
-    Mark( // We need to explicitly define the constructor in order to compile with MacOS Clang in C++ 11
-        RelativePosition position = RelativePosition{0.f},
-        ColorRGBA        color    = {0.f, 0.f, 0.f, 1.f}
+    explicit Mark( // We need to explicitly define the constructor in order to compile with MacOS Clang in C++ 11
+        RelativePosition position = RelativePosition{0.f}, ColorRGBA color = {0.f, 0.f, 0.f, 1.f}
     )
         : position{position}
         , color{color}
