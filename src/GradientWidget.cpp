@@ -190,6 +190,7 @@ auto GradientWidget::draw_gradient_marks(
                 _selected_mark == current_mark_id,
                 settings
             );
+            ImGui::PopID();
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
             {
                 res.hitbox_is_hovered     = true;
@@ -200,7 +201,6 @@ auto GradientWidget::draw_gradient_marks(
                     current_mark_id
                 );
             }
-            ImGui::PopID();
         }
     }
     static constexpr float space_between_gradient_bar_and_options = 20.f;
