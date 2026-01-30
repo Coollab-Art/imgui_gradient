@@ -152,14 +152,14 @@ static auto handle_interactions_with_hovered_mark(
         selected_mark = hovered_mark;
         interacted    = true;
     }
-    if (ImGui::IsMouseDoubleClicked(ImGuiPopupFlags_MouseButtonLeft))
+    if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
     {
         ImGui::OpenPopup("SelectedMarkColorPicker");
         selected_mark = hovered_mark;
         dragged_mark.reset();
         interacted = true;
     }
-    if (ImGui::IsMouseReleased(ImGuiPopupFlags_MouseButtonMiddle))
+    if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle))
     {
         mark_to_delete = hovered_mark; // When we middle click to delete a non selected mark it is impossible to remove this mark in the loop
         interacted     = true;
